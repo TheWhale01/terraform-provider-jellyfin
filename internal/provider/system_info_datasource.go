@@ -20,7 +20,6 @@ type systemInfoDataSource struct {
 type systemInfoDataSourceModel struct {
 	Id types.String `tfsdk:"id"`
 	Version types.String `tfsdk:"version"`
-	OperatingSystem types.String `tfsdk:"operating_system"`
 }
 
 func NewSystemInfoDataSource() datasource.DataSource {
@@ -41,10 +40,6 @@ func (d *systemInfoDataSource) Schema(ctx context.Context, req datasource.Schema
 			},
 			"version": schema.StringAttribute {
 				Description: "The Jellyfin server version.",
-				Computed: true,
-			},
-			"operating_system": schema.StringAttribute {
-				Description: "The server operating system.",
 				Computed: true,
 			},
 		},
@@ -78,7 +73,6 @@ func (d *systemInfoDataSource) Read(ctx context.Context, req datasource.ReadRequ
 
 	state.Id = types.StringValue(info.Id)
 	state.Version = types.StringValue(info.Version)
-	state.OperatingSystem = types.StringValue(info.OperatingSystem)
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }

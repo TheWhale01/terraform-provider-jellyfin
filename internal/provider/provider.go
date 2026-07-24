@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/TheWhale01/terraform-provider-jellyfin/internal/client"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -20,6 +21,8 @@ type JellyfinProvider struct {
 type JellyfinProviderModel struct {
 	Endpoint types.String `tfsdk:"endpoint"`
 	APIKey types.String `tfsdk:"api_key"`
+	Username types.String `tfsdk:"username"`
+	Password types.String `tfsdk:"password"`
 }
 
 func New(version string) func() provider.Provider {
@@ -48,6 +51,16 @@ func (p *JellyfinProvider) Schema(ctx context.Context, req provider.SchemaReques
 				Optional: true,
 				Sensitive: true,
 			},
+			"username": schema.StringAttribute {
+				Description: "The username used to authenticate to the jellyfin server.",
+				Optional: true,
+				Sensitive: true,
+			},
+			"password": schema.StringAttribute {
+				Description: "The password used to authenticate to the jellyfin server.",
+				Optional: true,
+				Sensitive: true,
+			},
 		},
 	}
 }
@@ -61,7 +74,7 @@ func (p *JellyfinProvider) Configure(ctx context.Context, req provider.Configure
 		return
 	}
 
-	if config.Endpoint.IsNull() || config.Endpoint.IsUnknown() || config.APIKey.IsNull() || config.APIKey.IsUnknown() {
+	if config.Endpoint.IsNull() || config.Endpoint.IsUnknown() {
 		resp.Diagnostics.AddWarning(
 			"Unable to create API client.",
 			"Cannot use unknown values for endpoint or api_key.",
@@ -72,6 +85,14 @@ func (p *JellyfinProvider) Configure(ctx context.Context, req provider.Configure
 	endpoint := config.Endpoint.ValueString()
 	apiKey := config.APIKey.ValueString()
 	apiClient := client.NewClient(endpoint, apiKey)
+	if apiKey == "" {
+		var accessToken, err = apiClient.AuthenticateByName(config.Username.ValueString(), config.Password.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError("User auth failed", fmt.Sprintf("Jellyfin auth failed: %s", err.Error()))
+			return
+		}
+		apiClient.APIKey = accessToken.AccessToken
+	}
 	resp.DataSourceData = apiClient
 	resp.ResourceData = apiClient
 }

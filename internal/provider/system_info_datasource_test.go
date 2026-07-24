@@ -1,0 +1,29 @@
+package provider_test
+
+import (
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+)
+
+func TestAccProvider_AuthByUsername(t *testing.T) {
+	resource.Test(t, resource.TestCase {
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep {
+			{
+				Config: `
+					provider "jellyfin" {
+						endpoint = "http://localhost:8097"
+						username = "admin"
+						password = "admin"
+					}
+					data "jellyfin_system_info" "test" {}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.jellyfin_system_info.test", "id"),
+					resource.TestCheckResourceAttrSet("data.jellyfin_system_info.test", "version"),
+				),
+			},
+		},
+	})
+}
