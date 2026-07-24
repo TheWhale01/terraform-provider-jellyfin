@@ -21,6 +21,7 @@
         go
         gopls
         gnumake
+        opentofu
       ];
     };
   };

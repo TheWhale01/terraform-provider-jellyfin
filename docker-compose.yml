@@ -27,6 +27,7 @@ services:
       - jf_cache:/cache
       - jf_config:/config
       - jf_media:/media
+      - jf_media:/media2
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/System/Info/Public"]
       interval: 2s

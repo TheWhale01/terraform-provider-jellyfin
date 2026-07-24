@@ -10,27 +10,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var _ datasource.DataSource = &systemInfoDataSource {}
-var _ datasource.DataSourceWithConfigure = &systemInfoDataSource {}
-
-type systemInfoDataSource struct {
+type SystemInfoDataSource struct {
 	client *client.Client
 }
 
-type systemInfoDataSourceModel struct {
+type SystemInfoDataSourceModel struct {
 	Id types.String `tfsdk:"id"`
 	Version types.String `tfsdk:"version"`
 }
 
 func NewSystemInfoDataSource() datasource.DataSource {
-	return &systemInfoDataSource {}
+	return &SystemInfoDataSource {}
 }
 
-func (d *systemInfoDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *SystemInfoDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_system_info"
 }
 
-func (d *systemInfoDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *SystemInfoDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema {
 		Description: "Retrieves system information from the Jellyfin server.",
 		Attributes: map[string]schema.Attribute {
@@ -46,7 +43,7 @@ func (d *systemInfoDataSource) Schema(ctx context.Context, req datasource.Schema
 	}
 }
 
-func (d *systemInfoDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *SystemInfoDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -62,8 +59,8 @@ func (d *systemInfoDataSource) Configure(ctx context.Context, req datasource.Con
 	d.client = apiClient
 }
 
-func (d *systemInfoDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var state systemInfoDataSourceModel
+func (d *SystemInfoDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var state SystemInfoDataSourceModel
 
 	info, err := d.client.GetSystemInfo()
 	if err != nil {

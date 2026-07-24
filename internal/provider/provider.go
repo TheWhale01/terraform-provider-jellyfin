@@ -12,8 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var _ provider.Provider = &JellyfinProvider {}
-
 type JellyfinProvider struct {
 	version string
 }
@@ -104,5 +102,7 @@ func (p *JellyfinProvider) DataSources(ctx context.Context) []func() datasource.
 }
 
 func (p *JellyfinProvider) Resources(ctx context.Context) []func() resource.Resource {
-	return []func() resource.Resource {}
+	return []func() resource.Resource {
+		NewLibraryResource,
+	}
 }
